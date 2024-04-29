@@ -1,0 +1,128 @@
+import random
+from functools import lru_cache
+from http import HTTPStatus
+from itertools import islice
+from pathlib import Path
+from string import Template
+from typing import Final, Iterable
+
+import uvicorn
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import HTMLResponse
+
+DIRECTORY_RESPONSE_TEMPLATE: Final = Template(
+    """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Directory listing for $current_dir</title>
+</head>
+<body>
+<h1>Directory listing for $current_dir</h1>
+<hr>
+<ul>
+$formatted_links
+</ul>
+<hr>
+</body>
+</html>"""
+)
+
+
+class RandomWordList:
+    """
+    An infinitely long iterable of random words based on a word list
+    """
+
+    def __init__(self, wordlist_path: Path):
+        self._words = self._load_wordlist(wordlist_path)
+        random.shuffle(self._words)
+
+        self.index = 0
+        self.max_index = len(self._words) - 1
+
+    @staticmethod
+    def _load_wordlist(wordlist_path: Path):
+        with open(wordlist_path, "r") as f:
+            return [line.rstrip() for line in f.readlines()]
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        retval = self._words[self.index]
+        self.index += 1
+
+        if self.index > self.max_index:
+            self.index = 0
+            random.shuffle(self._words)
+
+        return retval
+
+
+wordlist_path = Path(__file__).parent.resolve() / "wordlist.txt"
+random_words = RandomWordList(wordlist_path)
+app = FastAPI()
+
+
+@app.get("{full_path:path}")
+async def gafm(response: Response, full_path: str) -> HTMLResponse:
+    if full_path == "/robots.txt" or full_path == "/favicon.ico":
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+
+    content = get_dir_html_response_content(full_path)
+
+    if not full_path.endswith("/"):
+        # Ferroxbuster will start to ignore our redirect responses if they
+        # don't include content of varying length, lines, words, etc.
+        # Therefore, we use an HTML response instead of a RedirectResponse.
+        return HTMLResponse(
+            headers={"Location": full_path.rstrip("/") + "/"},
+            status_code=HTTPStatus.MOVED_PERMANENTLY,
+            content=content,
+        )
+
+    return HTMLResponse(content=content)
+
+
+def get_dir_html_response_content(path: str) -> str:
+    # Normalize path so that caching works properly
+    normalized_path = normalize_path(path)
+    return generate_response_content(normalized_path)
+
+
+def normalize_path(path: str) -> str:
+    return path.rstrip("/") + "/"
+
+
+# Caching this means we give a consisent view of a resource across multiple
+# requests, at least for a little while
+@lru_cache(maxsize=65536)
+def generate_response_content(path: str) -> str:
+    dir_names = generate_random_dir_names()
+    return format_dir_listing_response_body(path, dir_names)
+
+
+def generate_random_dir_names():
+    num_dirs = random.randint(3, 24)
+    return [dir_name + "/" for dir_name in islice(random_words, num_dirs)]
+
+
+def format_dir_listing_response_body(current_dir: str, dirs: Iterable[str]) -> str:
+    formatted_links = "\n".join([f"<li><a href={dirname}>{dirname}</a></li>" for dirname in dirs])
+    return DIRECTORY_RESPONSE_TEMPLATE.substitute(
+        current_dir=current_dir, formatted_links=formatted_links
+    )
+
+
+def main():
+    uvicorn.run(
+        "gafm.gafm:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=False,
+    )
+
+
+if __name__ == "__main__":
+    main()
