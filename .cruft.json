@@ -1,0 +1,35 @@
+{
+  "template": "https://github.com/mssalvatore/python-project-cookiecutter",
+  "commit": "a061c62bd501721af1e09ffcf88d85b743d9d7dd",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "GAFM",
+      "__project_slug": "gafm",
+      "full_name": "Mike Salvatore",
+      "email": "mike.s.salvatore@gmail.com",
+      "github_repo": "gafm",
+      "platform": "github",
+      "org": "mssalvatore",
+      "url": "https://github.com/mssalvatore/GAFM",
+      "__year": "2024",
+      "license": "GPLv3",
+      "versioning_scheme": "PEP440",
+      "project_short_description": "A tarpit for API fuzzers",
+      "python_major_version": "3",
+      "python_minor_version": "11",
+      "support_type_checking": "y",
+      "hook_shellcheck": "y",
+      "codecov": "y",
+      "exclude_these_file_in_flake8": "vulture_allowlist.py",
+      "_black_version": "24.3.0",
+      "_dlint_version": "0.14.1",
+      "_flake8_version": "6.0.0",
+      "_isort_version": "5.12.0",
+      "_mypy_version": "1.5.1",
+      "_vulture_version": "2.9.1",
+      "_template": "https://github.com/mssalvatore/python-project-cookiecutter"
+    }
+  },
+  "directory": null
+}
