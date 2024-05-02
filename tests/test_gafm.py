@@ -1,10 +1,12 @@
 from http import HTTPStatus
 from pathlib import Path
+from typing import Generator
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
 
-from gafm.gafm import RandomWordList, app, format_dir_listing_response_body
+from gafm.gafm import RandomWordList, app, format_dir_listing_response_body, redis_connection
 
 
 @pytest.fixture(scope="session")
@@ -42,8 +44,10 @@ def test_random_wordlist(
 
 
 @pytest.fixture
-def client() -> TestClient:
-    return TestClient(app, follow_redirects=False)
+def client() -> Generator[TestClient, None, None]:
+    app.dependency_overrides[redis_connection] = lambda: MagicMock()
+    yield TestClient(app, follow_redirects=False)
+    app.dependency_overrides.clear()
 
 
 @pytest.mark.parametrize("file_name", ["robots.txt", "favicon.ico"])
