@@ -137,8 +137,8 @@ def main():
         host="127.0.0.1",
         port=443,
         reload=False,
-        ssl_keyfile=Path(__file__).parent.resolve() / "key.pem",
-        ssl_certfile=Path(__file__).parent.resolve() / "cert.pem",
+        ssl_keyfile=Path(__file__).parent.parent.resolve() / "key.pem",
+        ssl_certfile=Path(__file__).parent.parent.resolve() / "cert.pem",
     )
 
 
