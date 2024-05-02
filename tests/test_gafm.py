@@ -78,10 +78,10 @@ def test_format_dir_listing_response_body__current_dir():
 def test_format_dir_listing_response_body__dir_with_spaces():
     response = format_dir_listing_response_body("test_dir/", ["dir 1/"])
 
-    assert "<li><a href=dir%201/>dir 1/</a></li>" in response
+    assert '<li><a href="dir%201/">dir 1/</a></li>' in response
 
 
 def test_format_dir_listing_response_body__dir_with_multiple_spaces():
     response = format_dir_listing_response_body("test_dir/", ["dir 1 2/"])
 
-    assert "<li><a href=dir%201%202/>dir 1 2/</a></li>" in response
+    assert '<li><a href="dir%201%202/">dir 1 2/</a></li>' in response
