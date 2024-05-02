@@ -40,7 +40,7 @@ class RandomWordList:
 
     def __init__(self, wordlist_path: Path):
         self._words = self._load_wordlist(wordlist_path)
-        random.shuffle(self._words)
+        random.shuffle(self._words)  # noqa: DUO102
 
         self.index = 0
         self.max_index = len(self._words) - 1
@@ -59,7 +59,7 @@ class RandomWordList:
 
         if self.index > self.max_index:
             self.index = 0
-            random.shuffle(self._words)
+            random.shuffle(self._words)  # noqa: DUO102
 
         return retval
 
@@ -118,7 +118,7 @@ def generate_response_content(path: str) -> str:
 
 
 def generate_random_dir_names():
-    num_dirs = random.randint(3, 24)
+    num_dirs = random.randint(3, 24)  # noqa: DUO102
     return [dir_name + "/" for dir_name in islice(random_words, num_dirs)]
 
 
