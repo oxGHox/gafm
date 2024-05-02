@@ -8,7 +8,7 @@ from string import Template
 from typing import Annotated, Final, Iterable
 
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 # TODO: Use asyncio?
@@ -77,10 +77,7 @@ app = FastAPI()
 
 @app.get("{full_path:path}")
 async def gafm(
-    request: Request,
-    response: Response,
-    full_path: str,
-    redis: Annotated[Redis, Depends(redis_connection)],
+    request: Request, full_path: str, redis: Annotated[Redis, Depends(redis_connection)]
 ) -> HTMLResponse:
     redis.incr(f"gafm:requests:{request.client.host}:{datetime.utcnow().strftime('%Y-%m-%d')}")
 
