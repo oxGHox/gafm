@@ -1,14 +1,18 @@
 import random
+from datetime import datetime
 from functools import lru_cache
 from http import HTTPStatus
 from itertools import islice
 from pathlib import Path
 from string import Template
-from typing import Final, Iterable
+from typing import Annotated, Final, Iterable
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
+
+# TODO: Use asyncio?
+from redis import Redis
 
 DIRECTORY_RESPONSE_TEMPLATE: Final = Template(
     """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -60,13 +64,25 @@ class RandomWordList:
         return retval
 
 
+@lru_cache
+def redis_connection() -> Redis:
+    return Redis(host="127.0.0.1", port=6379, decode_responses=True)
+
+
 wordlist_path = Path(__file__).parent.resolve() / "wordlist.txt"
 random_words = RandomWordList(wordlist_path)
 app = FastAPI()
 
 
 @app.get("{full_path:path}")
-async def gafm(response: Response, full_path: str) -> HTMLResponse:
+async def gafm(
+    request: Request,
+    response: Response,
+    full_path: str,
+    redis: Annotated[Redis, Depends(redis_connection)],
+) -> HTMLResponse:
+    redis.incr(f"gafm:requests:{request.client.host}:{datetime.utcnow().strftime('%Y-%m-%d')}")
+
     if full_path == "/robots.txt" or full_path == "/favicon.ico":
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
 
