@@ -66,6 +66,7 @@ class RandomWordList:
 
 @lru_cache
 def redis_connection() -> Redis:
+    print("CONNECTING TO REDIS")
     return Redis(host="127.0.0.1", port=6379, decode_responses=True)
 
 
@@ -135,8 +136,10 @@ def main():
     uvicorn.run(
         "gafm.gafm:app",
         host="127.0.0.1",
-        port=8000,
+        port=443,
         reload=False,
+        ssl_keyfile=Path(__file__).parent.resolve() / "key.pem",
+        ssl_certfile=Path(__file__).parent.resolve() / "cert.pem",
     )
 
 
