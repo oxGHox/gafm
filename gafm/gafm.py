@@ -123,7 +123,9 @@ def generate_random_dir_names():
 
 
 def format_dir_listing_response_body(current_dir: str, dirs: Iterable[str]) -> str:
-    formatted_links = "\n".join([f"<li><a href={dirname}>{dirname}</a></li>" for dirname in dirs])
+    formatted_links = "\n".join(
+        [f"<li><a href={dirname.replace(' ', '%20')}>{dirname}</a></li>" for dirname in dirs]
+    )
     return DIRECTORY_RESPONSE_TEMPLATE.substitute(
         current_dir=current_dir, formatted_links=formatted_links
     )
