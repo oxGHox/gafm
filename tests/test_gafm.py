@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from gafm.gafm import RandomWordList, app
+from gafm.gafm import RandomWordList, app, format_dir_listing_response_body
 
 
 @pytest.fixture(scope="session")
@@ -67,3 +67,9 @@ def test_gafm__directory_listing(client: TestClient, wordlist: list[str]):
     assert any((word in response.text for word in wordlist))
     assert "<html>" in response.text
     assert "Directory listing for /test_dir/" in response.text
+
+
+def test_format_dir_listing_response_body__current_dir():
+    response = format_dir_listing_response_body("test_dir/", ["file1", "file2"])
+
+    assert response.count("Directory listing for test_dir/") == 2
