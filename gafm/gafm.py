@@ -10,9 +10,7 @@ from typing import Annotated, Final, Iterable
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
-
-# TODO: Use asyncio?
-from redis import Redis
+from redis.asyncio import Redis
 
 DIRECTORY_RESPONSE_TEMPLATE: Final = Template(
     """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -79,7 +77,9 @@ app = FastAPI()
 async def gafm(
     request: Request, full_path: str, redis: Annotated[Redis, Depends(redis_connection)]
 ) -> HTMLResponse:
-    redis.incr(f"gafm:requests:{request.client.host}:{datetime.utcnow().strftime('%Y-%m-%d')}")
+    await redis.incr(
+        f"gafm:requests:{request.client.host}:{datetime.utcnow().strftime('%Y-%m-%d')}"
+    )
 
     if full_path == "/robots.txt" or full_path == "/favicon.ico":
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
