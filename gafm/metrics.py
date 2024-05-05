@@ -1,4 +1,4 @@
-"""A utility script for gathering stats about requests to the server."""
+"""A utility script for gathering metrics about requests to the server."""
 
 import tabulate
 from redis import Redis
