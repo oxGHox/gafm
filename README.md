@@ -10,3 +10,7 @@
 
 
 NOTE: Run `ulimit -Hn` to see what the hard limit is.
+
+### How to get metrics
+
+`poetry run python -m gafm.metrics`
