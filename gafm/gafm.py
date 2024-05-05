@@ -86,7 +86,7 @@ async def gafm(
 
     content = get_dir_html_response_content(full_path)
 
-    if not full_path.endswith("/"):
+    if not full_path[-1] == "/":
         # Ferroxbuster will start to ignore our redirect responses if they
         # don't include content of varying length, lines, words, etc.
         # Therefore, we use an HTML response instead of a RedirectResponse.
