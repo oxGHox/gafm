@@ -73,6 +73,15 @@ def test_gafm__directory_listing(client: TestClient, wordlist: list[str]):
     assert "Directory listing for /test_dir/" in response.text
 
 
+def test_gafm__directory_listing_multiple_slashes(client: TestClient, wordlist: list[str]):
+    response = client.get("/test_dir////")
+
+    assert response.status_code == HTTPStatus.OK
+    assert any((word in response.text for word in wordlist))
+    assert "<html>" in response.text
+    assert "Directory listing for /test_dir/" in response.text
+
+
 def test_format_dir_listing_response_body__current_dir():
     response = format_dir_listing_response_body("test_dir/", ["file1", "file2"])
 
