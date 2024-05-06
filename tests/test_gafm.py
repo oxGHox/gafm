@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from pathlib import Path
 from typing import Generator
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -45,7 +45,7 @@ def test_random_wordlist(
 
 @pytest.fixture
 def client() -> Generator[TestClient, None, None]:
-    app.dependency_overrides[redis_connection] = lambda: MagicMock()
+    app.dependency_overrides[redis_connection] = lambda: AsyncMock()
     yield TestClient(app, follow_redirects=False)
     app.dependency_overrides.clear()
 
