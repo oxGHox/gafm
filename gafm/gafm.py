@@ -12,6 +12,8 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from redis.asyncio import Redis
 
+from .config import Config
+
 DIRECTORY_RESPONSE_TEMPLATE: Final = Template(
     """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -29,6 +31,8 @@ $formatted_links
 </body>
 </html>"""
 )
+
+CONFIG = Config(_env_file=Path.cwd() / ".env")
 
 
 class RandomWordList:
@@ -65,7 +69,7 @@ class RandomWordList:
 @lru_cache
 def redis_connection() -> Redis:
     print("CONNECTING TO REDIS")
-    return Redis(host="127.0.0.1", port=6379, decode_responses=True)
+    return Redis(host=str(CONFIG.redis.host), port=CONFIG.redis.port, decode_responses=True)
 
 
 wordlist_path = Path(__file__).parent.resolve() / "wordlist.txt"
@@ -111,14 +115,14 @@ def normalize_path(path: str) -> str:
 
 # Caching this means we give a consisent view of a resource across multiple
 # requests, at least for a little while
-@lru_cache(maxsize=65536)
+@lru_cache(maxsize=CONFIG.max_cache_size)
 def generate_response_content(path: str) -> str:
     dir_names = generate_random_dir_names()
     return format_dir_listing_response_body(path, dir_names)
 
 
 def generate_random_dir_names():
-    num_dirs = random.randint(3, 24)  # noqa: DUO102
+    num_dirs = random.randint(CONFIG.min_subdirs, CONFIG.max_subdirs)  # noqa: DUO102
     return [dir_name + "/" for dir_name in islice(random_words, num_dirs)]
 
 
@@ -134,11 +138,11 @@ def format_dir_listing_response_body(current_dir: str, dirs: Iterable[str]) -> s
 def main():
     uvicorn.run(
         "gafm.gafm:app",
-        host="127.0.0.1",
-        port=443,
-        reload=False,
-        ssl_keyfile=Path(__file__).parent.parent.resolve() / "key.pem",
-        ssl_certfile=Path(__file__).parent.parent.resolve() / "cert.pem",
+        host=str(CONFIG.bind_address),
+        port=CONFIG.port,
+        reload=CONFIG.hot_reload,
+        ssl_certfile=CONFIG.ssl_certfile,
+        ssl_keyfile=CONFIG.ssl_keyfile,
     )
 
 
