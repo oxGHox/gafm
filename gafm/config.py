@@ -8,8 +8,17 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 NetworkPort = Annotated[int, Field(ge=0, le=65535)]
 
 
+class RedisConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="GAFM_REDIS_", extra="ignore")
+
+    host: IPv4Address | IPv6Address = Field(
+        default=IPv4Address("127.0.0.1"), description="The IP address for Redis"
+    )
+    port: NetworkPort = Field(default=6379, description="The port Redis is listening on")
+
+
 class Config(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="GAFM_")
+    model_config = SettingsConfigDict(env_prefix="GAFM_", extra="ignore")
 
     bind_address: IPv4Address | IPv6Address = Field(
         default=IPv4Address("127.0.0.1"), description="The interface that GAFM will listen on"
@@ -33,6 +42,7 @@ class Config(BaseSettings):
         le=4096,
     )
     port: NetworkPort = Field(default=8080, description="The port that GAFM will listen on")
+    redis: RedisConfig = Field(default_factory=RedisConfig)
     ssl_certfile: Path | None = Field(
         default=None,
         description="The path to an SSL certificate file; if this is not set, HTTP will be used.",

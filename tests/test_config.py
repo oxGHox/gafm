@@ -91,3 +91,11 @@ def test_environment_variable_interprets_booleans(
     config = Config()
 
     assert config.hot_reload is expected_value
+
+
+def test_redis_port(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("GAFM_REDIS_PORT", "1234")
+
+    config = Config()
+
+    assert config.redis.port == 1234
