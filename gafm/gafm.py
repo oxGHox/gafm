@@ -32,7 +32,7 @@ $formatted_links
 </html>"""
 )
 
-CONFIG = Config()
+CONFIG = Config(_env_file=Path.cwd() / ".env")
 
 
 class RandomWordList:
