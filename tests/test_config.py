@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from gafm.config import Config, RedisConfig
+from gafm.config import Config, load_config
 
 ENV_FILE = Path(__file__).parent / "test.env"
 
@@ -50,8 +50,7 @@ def test_load_environment_variables(monkeypatch: pytest.MonkeyPatch):
 
 
 def test_env_file_load():
-    redis_config = RedisConfig(_env_file=ENV_FILE)
-    config = Config(_env_file=ENV_FILE, redis=redis_config)
+    config = load_config(ENV_FILE)
 
     assert config.port == 1984
     assert config.redis.port == 1234
@@ -59,7 +58,7 @@ def test_env_file_load():
 
 def test_environment_overloads_envfile(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("GAFM_PORT", "99")
-    config = Config(_env_file=ENV_FILE)
+    config = load_config(ENV_FILE)
 
     assert config.port == 99
 

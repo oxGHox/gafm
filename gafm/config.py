@@ -67,3 +67,8 @@ class Config(BaseSettings):
             raise ValueError("ssl_cert and ssl_keyfile must be set together")
 
         return self
+
+
+def load_config(env_file: Path = Path.cwd() / ".env") -> Config:
+    _redis_config = RedisConfig(_env_file=env_file)
+    return Config(_env_file=env_file, redis=_redis_config)
