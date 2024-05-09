@@ -12,7 +12,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from redis.asyncio import Redis
 
-from .config import Config, RedisConfig
+from .config import load_config
 
 DIRECTORY_RESPONSE_TEMPLATE: Final = Template(
     """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -32,9 +32,7 @@ $formatted_links
 </html>"""
 )
 
-_env_file = Path.cwd() / ".env"
-_redis_config = RedisConfig(_env_file=_env_file)
-CONFIG = Config(_env_file=_env_file, redis=_redis_config)
+CONFIG = load_config(env_file=Path.cwd() / ".env")
 # TODO: Log config
 
 
