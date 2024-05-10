@@ -144,6 +144,8 @@ def main():
         reload=CONFIG.hot_reload,
         ssl_certfile=CONFIG.ssl_certfile,
         ssl_keyfile=CONFIG.ssl_keyfile,
+        proxy_headers=False,
+        forwarded_allow_ips=None
     )
 
 
