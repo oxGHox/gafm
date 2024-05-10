@@ -1,0 +1,50 @@
+version: "3"
+services:
+  redis-server:
+    image: redis
+    hostname: gafm-redis
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redis-data:/data
+    networks:
+      net:
+        ipv4_address: 172.16.255.10
+    container_name: gafm-redis
+  gafm-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - GAFM_BIND_ADDRESS=172.16.255.11
+      - GAFM_PORT=443
+      - GAFM_REDIS_HOST=172.16.255.10
+      - GAFM_SSL_CERTFILE=cert.pem
+      - GAFM_SSL_KEYFILE=key.pem
+    hostname: gafm-srv
+    networks:
+      net:
+        ipv4_address: 172.16.255.11
+    container_name: gafm-srv
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+      - "8443:8443"
+    networks:
+      net:
+        ipv4_address: 172.16.255.12
+    container_name: gafm-nginx    
+networks:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.255.0/24
+volumes:
+  redis-data:
+
