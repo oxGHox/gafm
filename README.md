@@ -63,7 +63,7 @@ The port that GAFM will listen on
 
 *Optional*, default value: `127.0.0.1`
 
-The IP address for Redis
+The IP address or hostname for the Redis server
 
 ### `GAFM_REDIS_PORT`
 

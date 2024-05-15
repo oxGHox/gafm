@@ -11,8 +11,9 @@ NetworkPort = Annotated[int, Field(ge=0, le=65535)]
 class RedisConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="GAFM_REDIS_", extra="ignore")
 
-    host: IPv4Address | IPv6Address = Field(
-        default=IPv4Address("127.0.0.1"), description="The IP address for Redis"
+    host: IPv4Address | IPv6Address | str = Field(
+        default=IPv4Address("127.0.0.1"),
+        description="The IP address or hostname for the Redis server",
     )
     port: NetworkPort = Field(default=6379, description="The port Redis is listening on")
 
