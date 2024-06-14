@@ -14,6 +14,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - GAFM_BIND_ADDRESS=172.16.255.11
+      - GAFM_PORT=443
+      - GAFM_REDIS_HOST=172.16.255.10
+      - GAFM_SSL_CERTFILE=cert.pem
+      - GAFM_SSL_KEYFILE=key.pem
     hostname: gafm-srv
     networks:
       net:
