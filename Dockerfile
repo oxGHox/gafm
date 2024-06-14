@@ -12,9 +12,6 @@ ADD gafm /usr/share/gafm/gafm
 ADD pyproject.toml /usr/share/gafm
 ADD poetry.lock /usr/share/gafm
 
-# Touch .config to bypass complaints
-#RUN touch /usr/share/gafm/.env
-
 # Change to gafm work dir
 WORKDIR /usr/share/gafm
 
